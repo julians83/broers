@@ -40,12 +40,18 @@ async function seed() {
   ];
 
   for (const user of users) {
-    const createdUser = await usersService.create(user);
-
-    console.log(`Usuario creado: ${createdUser}`);
+    const existingUser = await usersService.findByEmail(user.email);
+    if (!existingUser) {
+      const createdUser = await usersService.create(user);
+      console.log(`✅ Usuario creado: ${createdUser.email}`);
+    } else {
+      console.log(
+        `⚠️ Usuario ya existente: ${existingUser.email}, no se creará.`,
+      );
+    }
   }
 
-  console.log('✅ Se han creado 5 usuarios de prueba exitosamente.');
+  console.log('✅ Seed ejecutado correctamente.');
   await app.close();
 }
 
