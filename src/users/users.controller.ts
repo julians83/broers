@@ -6,16 +6,21 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { Public } from 'src/auth/decorators/public.decorator';
+import { JwtAuthGuard } from '../Guards/jwt-auth.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { IUser } from './interfaces/user.interface';
 import { UsersService } from './users.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Public()
   @Post()
   async create(@Body() createUserDto: CreateUserDto): Promise<IUser> {
     return this.usersService.create(createUserDto);

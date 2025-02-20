@@ -1,9 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 // import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const reflector = app.get(Reflector);
+  app.useGlobalGuards(new JwtAuthGuard(reflector));
 
   // const config = new DocumentBuilder()
   //   .setTitle('Backend Test API')

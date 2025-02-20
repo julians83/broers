@@ -6,15 +6,49 @@ async function seed() {
   const app = await NestFactory.createApplicationContext(AppModule);
   const usersService = app.get(UsersService);
 
-  await usersService.create({
-    fullName: 'Admin User',
-    email: 'admin@example.com',
-    password: 'admin123',
-    // isActive: true,
-  });
+  const users = [
+    {
+      fullName: 'Test 1',
+      email: 'test1@test.com',
+      password: 'test123',
+      isActive: true,
+    },
+    {
+      fullName: 'Test 2',
+      email: 'test2@test.com',
+      password: 'test123',
+      isActive: true,
+    },
+    {
+      fullName: 'Test 3',
+      email: 'test3@test.com',
+      password: 'test123',
+      isActive: true,
+    },
+    {
+      fullName: 'Test 4',
+      email: 'test4@test.com',
+      password: 'test123',
+      isActive: true,
+    },
+    {
+      fullName: 'Test 5',
+      email: 'test5@test.com',
+      password: 'test123',
+      isActive: true,
+    },
+  ];
 
-  console.log('Usuarios de prueba creados');
+  for (const user of users) {
+    const createdUser = await usersService.create(user);
+
+    console.log(`Usuario creado: ${createdUser}`);
+  }
+
+  console.log('✅ Se han creado 5 usuarios de prueba exitosamente.');
   await app.close();
 }
 
-seed();
+seed().catch((error) => {
+  console.error('❌ Error al ejecutar el seed:', error);
+});

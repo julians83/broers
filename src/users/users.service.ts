@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
@@ -9,15 +10,28 @@ import { User } from './schemas/user.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async create(userData: CreateUserDto): Promise<IUser> {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
+
     const newUser = new this.userModel({
       ...userData,
       password: hashedPassword,
     });
+
+    const token = this.jwtService.sign({
+      email: newUser.email,
+      sub: newUser.email,
+    });
+
+    newUser.token = token;
+
     const savedUser = await newUser.save();
+
     return this.toUserResponse(savedUser);
   }
 
@@ -71,6 +85,7 @@ export class UsersService {
       password: user.password,
       email: user.email,
       createdAt: user.createdAt,
+      token: user.token,
       isActive: user.isActive,
     };
   }
