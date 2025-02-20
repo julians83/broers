@@ -22,7 +22,8 @@ services:
       - '3000:3000'
     volumes:
       - .:/app
-    command: sh -c "npm run start:dev && npm run seed"
+      - /app/node_modules
+    command: sh -c "npm run seed && npm run start"
 
 volumes:
   mongodb_data:
