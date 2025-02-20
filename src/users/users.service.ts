@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -11,7 +12,11 @@ export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async create(userData: CreateUserDto): Promise<IUser> {
-    const newUser = new this.userModel(userData);
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    const newUser = new this.userModel({
+      ...userData,
+      password: hashedPassword,
+    });
     const savedUser = await newUser.save();
     return this.toUserResponse(savedUser);
   }
@@ -38,9 +43,14 @@ export class UsersService {
   }
 
   async update(id: string, updateData: UpdateUserDto): Promise<IUser> {
+    if (updateData.password) {
+      updateData.password = await bcrypt.hash(updateData.password, 10);
+    }
+
     const updatedUser = await this.userModel
       .findByIdAndUpdate(id, updateData, { new: true })
       .lean();
+
     if (!updatedUser) {
       throw new NotFoundException('User not found');
     }

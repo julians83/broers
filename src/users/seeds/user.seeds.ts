@@ -10,7 +10,7 @@ async function seed() {
     fullName: 'Admin User',
     email: 'admin@example.com',
     password: 'admin123',
-    isActive: true,
+    // isActive: true,
   });
 
   console.log('Usuarios de prueba creados');

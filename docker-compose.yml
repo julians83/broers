@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_container
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb_data:/data/db
+
+  backend:
+    build: .
+    container_name: nestjs_backend
+    restart: always
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/nestjs_db
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app
+    command: npm run start:dev
+
+volumes:
+  mongodb_data:
